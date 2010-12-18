@@ -1,0 +1,6 @@
+ColdFusion on Wheels plugin 
+Builds and returns a form using the PayPal HTML Variables for the Website Payments Standard
+
+
+Documentation 
+Available under the index.cfm file.
