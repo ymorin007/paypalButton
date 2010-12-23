@@ -91,6 +91,9 @@
 		<cfargument name="t3" type="string" required="false"
 					hint="Regular subscription units of duration. Allowable values:D – for days; allowable range for p3 is 1 to 90,W – for weeks; allowable range for p3 is 1 to 52,M – for months; allowable range for p3 is 1 to 24,Y – for years; allowable range for p3 is 1 to 5">
 
+		<cfargument name="buttonImage" type="string" required="false"
+					hint="Use custom button images that match the look of your website. Enter the url for the image.">
+
 		<cfargument name="sameWindow" type="boolean" required="false" default="1"
 					hint="Target the click event to open on the same window. If false it PayPal will open in a new window.">
 
@@ -100,11 +103,12 @@
 		<cfset var loc = {}>
 
 		<cfset loc.submitImage = "">
+		<cfset loc.imageSource = "">
 		<cfset loc.langButtonDir = arguments.lang>
 		<cfset loc.showCreditCard = "CC"><!--- By Default we are showing the credit card logo on the submit button --->
 		<cfset loc.environment = "https://www.sandbox.paypal.com/cgi-bin/webscr"><!--- By Default we are using the testing environment --->
 
-		<cfif arguments.environmentActive><!--- Since environnentActive = true and that the environment is not production then lets use the testing --->
+		<cfif arguments.environmentActive>
 			<cfif get("environment") EQ "production">
 				<cfset loc.environment = "https://www.paypal.com/cgi-bin/webscr">
 			<cfelse>
@@ -125,70 +129,77 @@
 			<cfset loc.sameWindow = "">
 		</cfif>
 
-		<!--- If we dont want to show the credit card  or that its a type of cart then  --->
+		<!--- If we dont want to show the credit card or that its of type "_cart" then  --->
 		<cfif arguments.showCreditCard EQ 0 OR arguments.type EQ "_cart">
 			<cfset loc.showCreditCard = "">
 		</cfif>
 
-		<!--- Lets choose the right image from the selected type of button --->
-		<cfswitch expression = #arguments.type#>
-			<cfcase value = "_cart">
-				<cfif arguments.cart EQ "add">
-		        	<cfset loc.submitImage = "btn_cart_LG.gif">
-		        <cfelseif arguments.cart EQ "display">
-		        	<cfset loc.submitImage = "view_cart_new.gif">
-				</cfif>
-		    </cfcase>
-			<cfcase value = "_xclick">
-		        <cfset loc.submitImage = "btn_buynow#loc.showCreditCard#_LG.gif">
-		    </cfcase>
-			<cfcase value = "_donations">
-		        <cfset loc.submitImage = "btn_donate#loc.showCreditCard#_LG.gif">
-		    </cfcase>
-			<cfcase value = "_oe-gift-certificate">
-		        <cfset loc.submitImage = "btn_gift#loc.showCreditCard#_LG.gif">
-		    </cfcase>
-			<cfcase value = "_xclick-subscriptions">
-		        <cfset loc.submitImage = "btn_subscribe#loc.showCreditCard#_LG.gif">
-		    </cfcase>
-		</cfswitch>
+		<!--- If they want to show their own button then make it happen otherwise choose the one related to the "type" parameter --->
+		<cfif StructKeyExists(arguments, "buttonImage")>
+			<cfset loc.imageSource = arguments.buttonImage>
+		<cfelse>
+			<!--- Lets choose the right image from the selected type of button --->
+			<cfswitch expression = #arguments.type#>
+				<cfcase value = "_cart">
+					<cfif arguments.cart EQ "add">
+			        	<cfset loc.submitImage = "btn_cart_LG.gif">
+			        <cfelseif arguments.cart EQ "display">
+			        	<cfset loc.submitImage = "view_cart_new.gif">
+					</cfif>
+			    </cfcase>
+				<cfcase value = "_xclick">
+			        <cfset loc.submitImage = "btn_buynow#loc.showCreditCard#_LG.gif">
+			    </cfcase>
+				<cfcase value = "_donations">
+			        <cfset loc.submitImage = "btn_donate#loc.showCreditCard#_LG.gif">
+			    </cfcase>
+				<cfcase value = "_oe-gift-certificate">
+			        <cfset loc.submitImage = "btn_gift#loc.showCreditCard#_LG.gif">
+			    </cfcase>
+				<cfcase value = "_xclick-subscriptions">
+			        <cfset loc.submitImage = "btn_subscribe#loc.showCreditCard#_LG.gif">
+			    </cfcase>
+			</cfswitch>
 
-		<!--- Lets choose the language for the submit button (en, fr, es, de, nl, zh, ja, pt) --->
-		<cfswitch expression = #arguments.lang#>
-			<cfcase value = "en">
-		        <cfset loc.langButtonDir = "en_US">
-		        <cfset loc.langButtonAlt = "PayPal - The safer, easier way to pay online!">
-		    </cfcase>
-			<cfcase value = "fr">
-		        <cfset loc.langButtonDir = "fr_XC">
-		        <cfset loc.langButtonAlt = "PayPal - la solution de paiement en ligne la plus simple et la plus sécurisée !">
-		    </cfcase>
-			<cfcase value = "es">
-		        <cfset loc.langButtonDir = "es_XC">
-		        <cfset loc.langButtonAlt = "PayPal. La forma rápida y segura de pagar en línea.">
-		    </cfcase>
-			<cfcase value = "de">
-		        <cfset loc.langButtonDir = "de_DE/DE">
-		        <cfset loc.langButtonAlt = "Jetzt einfach, schnell und sicher online bezahlen – mit PayPal.">
-		    </cfcase>
-			<cfcase value = "nl">
-		        <cfset loc.langButtonDir = "nl_NL/BE">
-		        <cfset loc.langButtonAlt = "PayPal, de veilige en complete manier van online betalen.">
-		    </cfcase>
-			<cfcase value = "zh">
-		        <cfset loc.langButtonDir = "zh_XC">
-		        <cfset loc.langButtonAlt = "PayPal － 更安全、更簡單的網上付款方式！">
-		    </cfcase>
-			<cfcase value = "ja">
-		        <cfset loc.langButtonDir = "ja_JP/JP">
-		        <cfset loc.langButtonAlt = "PayPal- オンラインで安全・簡単にお支払い">
-		    </cfcase>
-			<cfcase value = "pt">
-		        <cfset loc.langButtonDir = "pt_BR/BR">
-		        <cfset loc.langButtonAlt = "PayPal - A maneira mais fácil e segura de efetuar pagamentos on-line!">
-		    </cfcase>
+			<!--- Lets choose the language for the submit button (en, fr, es, de, nl, zh, ja, pt) --->
+			<cfswitch expression = #arguments.lang#>
+				<cfcase value = "en">
+			        <cfset loc.langButtonDir = "en_US">
+			        <cfset loc.langButtonAlt = "PayPal - The safer, easier way to pay online!">
+			    </cfcase>
+				<cfcase value = "fr">
+			        <cfset loc.langButtonDir = "fr_XC">
+			        <cfset loc.langButtonAlt = "PayPal - la solution de paiement en ligne la plus simple et la plus sécurisée !">
+			    </cfcase>
+				<cfcase value = "es">
+			        <cfset loc.langButtonDir = "es_XC">
+			        <cfset loc.langButtonAlt = "PayPal. La forma rápida y segura de pagar en línea.">
+			    </cfcase>
+				<cfcase value = "de">
+			        <cfset loc.langButtonDir = "de_DE/DE">
+			        <cfset loc.langButtonAlt = "Jetzt einfach, schnell und sicher online bezahlen – mit PayPal.">
+			    </cfcase>
+				<cfcase value = "nl">
+			        <cfset loc.langButtonDir = "nl_NL/BE">
+			        <cfset loc.langButtonAlt = "PayPal, de veilige en complete manier van online betalen.">
+			    </cfcase>
+				<cfcase value = "zh">
+			        <cfset loc.langButtonDir = "zh_XC">
+			        <cfset loc.langButtonAlt = "PayPal － 更安全、更簡單的網上付款方式！">
+			    </cfcase>
+				<cfcase value = "ja">
+			        <cfset loc.langButtonDir = "ja_JP/JP">
+			        <cfset loc.langButtonAlt = "PayPal- オンラインで安全・簡単にお支払い">
+			    </cfcase>
+				<cfcase value = "pt">
+			        <cfset loc.langButtonDir = "pt_BR/BR">
+			        <cfset loc.langButtonAlt = "PayPal - A maneira mais fácil e segura de efetuar pagamentos on-line!">
+			    </cfcase>
+			</cfswitch>
 
-		</cfswitch>
+			<cfset loc.imageSource = "https://www.paypal.com/#loc.langButtonDir#/i/btn/#loc.submitImage#">
+
+		</cfif>
 
 		<cfoutput>
 
@@ -280,7 +291,7 @@
 						<input type="hidden" name="cpp_header_image" value="#arguments.headerImage#">
 					</cfif>
 
-					<input type="image" src="https://www.paypal.com/#loc.langButtonDir#/i/btn/#loc.submitImage#" border="0" name="submit" alt="#loc.langButtonAlt#">
+					<input type="image" src="#loc.imageSource#" border="0" name="submit" alt="#loc.langButtonAlt#">
 					<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
 				</form>
 			</cfsavecontent>
@@ -355,6 +366,170 @@
 		</cfif>
 
 		</cfoutput>
+
+	</cffunction>
+
+	<cffunction name="verifyPaypalPayment" hint="Using Instant Payment Notification (IPN) postback method it will verify that the transaction is valid.
+												To activate Instant Payment Notification, you will need to enter the URL (notifyUrl from showPaypalButton())
+												at which you would like to receive the notification posts from your Profile. You need to use this function
+												inside the action of the notifyUrl.">
+
+		<cfargument name="environment" type="string" required="false" default="testing"
+					hint="What environment you want to use? Choose between testing and production.">
+
+		<cfargument name="environmentActive" type="boolean" required="false" default="0"
+					hint="You can let your active environment setting manage witch environment to use.">
+
+		<cfargument name="price" type="string" required="false"
+					hint="Enter the price that you want to compare. If not identical it return 5.">
+
+		<cfargument name="itemNumber" type="string" required="false"
+					hint="Enter the item number that you want to compare. If not identical it return 6.">
+
+		<cfargument name="currency" type="string" required="false" default="USD"
+					hint="Enter the currency that you want to compare. If not identical it return 7.">
+
+		<cfargument name="receiverEmail" type="string" required="true"
+					hint="Primary email address of the payment recipient (that is, the merchant). If the payment is sent to a non-primary email address on your PayPal account, the receiverEmail is still your primary email.">
+
+		<!---
+
+		Returns
+
+		0, if response from PayPal equal INVALID
+		1, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Completed" and it meets all your checks (price, itemNumber, currency, receiverEmail)
+		2, if response from PayPal equal VERIFIED and RECEIVER EMAIL not equal to arguments.receiverEmail
+		3, if response from PayPal equal VERIFIED and PRICE not equal to arguments.price
+		4, if response from PayPal equal VERIFIED and ITEM NUMBER not equal to arguments.itemNumber
+		5, if response from PayPal equal VERIFIED and CURRENCY not equal to arguments.currency
+		6, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Canceled_Reversal"
+		7, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Completed"
+		8, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Denied"
+		9, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Expired"
+		10, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Failed"
+		11, if response from PayPal equal VERIFIED and PAYMENT STATUS return "In-Progress"
+		12, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Partially_Refunded"
+		13, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Pending"
+		14, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Processed"
+		15, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Refunded"
+		16, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Reversed"
+		17, if response from PayPal equal VERIFIED and PAYMENT STATUS return "Voided"
+
+		Note that the function can return more then 1 value. Ex. the payment status could be pending and also the price, currency, item number and receiver email could have been modified
+
+		 --->
+
+		<cfset var loc = {}>
+		<cfset loc.returnValue = "0">
+		<cfset loc.parameters="cmd=_notify-validate"><!---  The postback to PayPal must include the variable cmd with the value _notify-validat --->
+
+		<!--- The postback must include exactly the same variables and values that you receive in the
+		IPN from PayPal, and they must be in the same order otherwise it will return "INVALID"  --->
+		<cfloop list="#structKeyList(params)#" index="key">
+			<cfset loc.parameters = loc.parameters & "&#LCase(key)#=#URLEncodedFormat(params[key])#">
+		</cfloop>
+
+		<cfif StructKeyExists(form, "payment_date")>
+		    <cfset loc.parameters = loc.parameters & "&payment_date=#URLEncodedFormat(Form.payment_date)#">
+		</cfif>
+
+		<cfif StructKeyExists(form, "subscr_date")>
+		    <cfset loc.parameters = loc.parameters & "&subscr_date=#URLEncodedFormat(Form.subscr_date)#">
+		</cfif>
+
+		<cfif arguments.environmentActive>
+			<cfif get("environment") EQ "production">
+				<!--- PayPal will respond to the post with a single word, "VERIFIED" or "INVALID", in the body of the response. --->
+				<cfhttp url="https://www.paypal.com/cgi-bin/webscr?#loc.parameters#" method="get" resolveURL="false"></cfhttp>
+			<cfelse>
+				<cfhttp url="https://www.sandbox.paypal.com/cgi-bin/webscr?#loc.loc.parameters#" method="get" resolveURL="false"></cfhttp>
+			</cfif>
+		<cfelse>
+			<cfif arguments.environment EQ "production">
+				<cfhttp url="https://www.paypal.com/cgi-bin/webscr?#loc.parameters#" method="get" resolveURL="false"></cfhttp>
+			<cfelse>
+				<cfhttp url="https://www.sandbox.paypal.com/cgi-bin/webscr?#loc.parameters#" method="get" resolveURL="false"></cfhttp>
+			</cfif>
+		</cfif>
+
+		<!--- check notification validation
+			When you receive a VERIFIED response, you need to perform several checks before fulfilling the order:
+			Confirm that the "payment_status" is "Completed," since IPNs are also sent for other results such as "Pending" or "Failed"
+			Validate that the "receiver_email" is an email address registered in your PayPal account, to prevent the payment from being sent to a fraudster's account
+			Check other transaction details such as the item number and price to confirm that the value has not been changed
+		--->
+		<cfif StructKeyExists(form, "payment_status") AND cfhttp.fileContent is "VERIFIED">
+
+			<cfset loc.returnValue = ""><!--- Since we know the return value is VERIFIED we can reset it.  Now lets perfom some other validation --->
+
+			<!--- check that receiver_email is your email address (arguments.business) --->
+			<cfif StructKeyExists(arguments, "receiverEmail") AND compare(form.receiver_email, arguments.receiverEmail) NEQ 0>
+				<cfset loc.returnValue = listAppend(loc.returnValue, "2")>
+			</cfif>
+
+			<!--- check that form.mc_gross provided by PayPal is identical to the (arguments.price) --->
+			<cfif StructKeyExists(arguments, "price") AND compare(form.mc_gross, arguments.price) NEQ 0>
+				<cfset loc.returnValue = listAppend(loc.returnValue, "3")>
+			</cfif>
+
+			<!--- check that form.item_number provided by PayPal is identical to the (arguments.itemNumber) --->
+			<cfif StructKeyExists(arguments, "itemNumber") AND StructKeyExists(form, "item_number") AND compare(form.item_number, arguments.itemNumber) NEQ 0>
+				<cfset loc.returnValue = listAppend(loc.returnValue, "4")>
+			</cfif>
+
+			<!--- check that form.mc_currency provided by PayPal is identical to the (arguments.currency) --->
+			<cfif compare(form.mc_currency, arguments.currency) NEQ 0>
+				<cfset loc.returnValue = listAppend(loc.returnValue, "5")>
+			</cfif>
+
+			<!--- check the payment_status --->
+			<cfswitch expression = "#form.payment_status#">
+				<cfcase value = "Canceled_Reversal">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "6")>
+			    </cfcase>
+				<cfcase value = "Completed">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "7")>
+			    </cfcase>
+				<cfcase value = "Denied">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "8")>
+			    </cfcase>
+				<cfcase value = "Expired">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "9")>
+			    </cfcase>
+				<cfcase value = "Failed">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "10")>
+			    </cfcase>
+				<cfcase value = "In-Progress">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "11")>
+			    </cfcase>
+				<cfcase value = "Partially_Refunded">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "12")>
+			    </cfcase>
+				<cfcase value = "Pending">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "13")>
+			    </cfcase>
+				<cfcase value = "Processed">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "14")>
+			    </cfcase>
+				<cfcase value = "Refunded">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "15")>
+			    </cfcase>
+				<cfcase value = "Reversed">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "16")>
+			    </cfcase>
+				<cfcase value = "Voided">
+					<cfset loc.returnValue = listAppend(loc.returnValue, "17")>
+			    </cfcase>
+			</cfswitch>
+
+			<!--- Now if it pass all the previous checks and the payment status is Completed (7) then we can update the return value to 1  --->
+			<cfif loc.returnValue EQ "7">
+				<cfset loc.returnValue = "1">
+			</cfif>
+
+		</cfif>
+
+		<cfreturn loc.returnValue>
 
 	</cffunction>
 
