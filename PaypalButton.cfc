@@ -533,4 +533,83 @@
 
 	</cffunction>
 
+	<cffunction name="paypalCurrencyToLocale" hint="Convert the PayPal 3-character ISO-4217 currency codes to a locale for ColdFusion processing">
+
+		<cfargument name="currency" type="string" required="false" default="USD"
+					hint="Enter the PayPal 3-character ISO-4217 currency code that you want to convert">
+
+		<cfset var loc = {}>
+		<cfset loc.returnValue = "0">
+
+		<cfswitch expression = "#arguments.currency#">
+			<cfcase value = "AUD"><!--- Australian Dollar --->
+				<cfset loc.returnValue = "en_AU">
+		    </cfcase>
+			<cfcase value = "CAD"><!--- Canadian Dollar --->
+				<cfset loc.returnValue = "en_CA">
+		    </cfcase>
+			<cfcase value = "CZK"><!--- Czech Koruna --->
+				<cfset loc.returnValue = "cs_CZ">
+		    </cfcase>
+			<cfcase value = "DKK"><!--- Danish Krone --->
+				<cfset loc.returnValue = "da_DK">
+		    </cfcase>
+			<cfcase value = "EUR"><!--- Euro --->
+				<cfset loc.returnValue = "fr_FR">
+		    </cfcase>
+			<cfcase value = "HKD"><!--- Hong Kong Dollar --->
+				<cfset loc.returnValue = "zh_HK">
+		    </cfcase>
+			<cfcase value = "HUF"><!--- Hungarian Forint --->
+				<cfset loc.returnValue = "hu_HU">
+		    </cfcase>
+			<cfcase value = "ILS"><!--- Israeli New Sheqel --->
+				<cfset loc.returnValue = "iw_IL">
+		    </cfcase>
+			<cfcase value = "JPY"><!--- Japanese Yen --->
+				<cfset loc.returnValue = "ja_JP">
+		    </cfcase>
+			<cfcase value = "MXN"><!--- Mexican Peso --->
+				<cfset loc.returnValue = "es_MX">
+		    </cfcase>
+			<cfcase value = "NOK"><!--- Norwegian Krone --->
+				<cfset loc.returnValue = "no_NO">
+		    </cfcase>
+			<cfcase value = "NZD"><!--- New Zealand Dollar --->
+				<cfset loc.returnValue = "en_NZ">
+		    </cfcase>
+			<cfcase value = "PHP"><!--- Philippine Peso --->
+				<cfset loc.returnValue = "en_PH">
+		    </cfcase>
+			<cfcase value = "PLN"><!--- Polish Zloty --->
+				<cfset loc.returnValue = "pl_PL">
+		    </cfcase>
+			<cfcase value = "GBP"><!--- Pound Sterling --->
+				<cfset loc.returnValue = "en_GB">
+		    </cfcase>
+			<cfcase value = "SGD"><!--- Singapore Dollar --->
+				<cfset loc.returnValue = "en_SG">
+		    </cfcase>
+			<cfcase value = "SEK"><!--- Swedish Krona --->
+				<cfset loc.returnValue = "sv_SE">
+		    </cfcase>
+			<cfcase value = "CHF"><!--- Swiss Franc --->
+				<cfset loc.returnValue = "it_CH">
+		    </cfcase>
+			<cfcase value = "TWD"><!--- Taiwan New Dollar --->
+				<cfset loc.returnValue = "zh_TW">
+		    </cfcase>
+			<cfcase value = "THB"><!--- Thai Baht --->
+				<cfset loc.returnValue = "th_TH">
+		    </cfcase>
+			<cfcase value = "USD"><!--- U.S. Dollar --->
+				<cfset loc.returnValue = "en_US">
+		    </cfcase>
+
+		</cfswitch>
+
+		<cfreturn loc.returnValue>
+
+	</cffunction>
+
 </cfcomponent>
