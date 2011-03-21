@@ -376,7 +376,24 @@
 				  <td valign="top">The debug will show you what to do if  you miss  some of the specific parameter requirements. Since some parameter only applies to some type of button. Try it you will see what I mean it won't hurt.</td>
 				  <td valign="top">All</td>
           </tr> 
-			
+          </tr>
+				<tr class="highlight">
+				  <td valign="top">onLoadSubmit</td>
+				  <td valign="top">boolean</td>
+				  <td valign="top" class="required">No</td>
+				  <td valign="top">0</td>
+				  <td valign="top">Should it submit onLoad or not?</td>
+				  <td valign="top">All</td>
+          </tr> 
+          </tr>
+				<tr class="highlight">
+				  <td valign="top">onLoadSubmitMessage</td>
+				  <td valign="top">string</td>
+				  <td valign="top" class="required">No</td>
+				  <td valign="top">You Are Being Automatically Redirected to PayPal</td>
+				  <td valign="top">Message to appear if you use the onLoadSubmit</td>
+				  <td valign="top">All</td>
+          </tr> 
 		</tbody> 
 	</table> 
  

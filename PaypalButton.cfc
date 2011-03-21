@@ -100,6 +100,12 @@
 		<cfargument name="debug" type="boolean" required="false" default="0"
 					hint="The debug will show you what to do if you miss some of the specific parameter requirements. Since some parameter only applies to some type of button. Try it you will see what I mean it won't hurt.">
 
+		<cfargument name="onLoadSubmit" type="boolean" required="false" default="0" 
+				   	hint="Should it submit onLoad or not?">
+
+		<cfargument name="onLoadSubmitMessage" type="string" required="false" default="<p>You Are Being Automatically Redirected to PayPal</p>" 
+				   	hint="Message to appear if you use the onLoadSubmit">
+
 		<cfset var loc = {}>
 
 		<cfset loc.submitImage = "">
@@ -107,6 +113,7 @@
 		<cfset loc.langButtonDir = arguments.lang>
 		<cfset loc.showCreditCard = "CC"><!--- By Default we are showing the credit card logo on the submit button --->
 		<cfset loc.environment = "https://www.sandbox.paypal.com/cgi-bin/webscr"><!--- By Default we are using the testing environment --->
+		<cfset loc.sameWindow = "">
 
 		<cfif arguments.environmentActive>
 			<cfif get("environment") EQ "production">
@@ -125,8 +132,11 @@
 		<!--- Open in same window or not? That is the question --->
 		<cfif arguments.sameWindow EQ 0>
 			<cfset loc.sameWindow = "target='paypal'">
-		<cfelse>
-			<cfset loc.sameWindow = "">
+		</cfif>
+
+		<!--- submit onLoad --->
+		<cfif arguments.onLoadSubmit EQ 1>
+			<cfset loc.onLoadSubmit = "onLoad=""document.paypalform.submit();""">
 		</cfif>
 
 		<!--- If we dont want to show the credit card or that its of type "_cart" then  --->
@@ -206,7 +216,7 @@
 		<cfif StructKeyExists(arguments, "business")><!--- Don't show the form if no paypal id or email has been provided --->
 
 			<cfsavecontent variable="paypalform">
-				<form action="#loc.environment#" method="post" #loc.sameWindow#>
+				<form action="#loc.environment#" method="post" name="paypalform" #loc.sameWindow# target="_top">
 
 					<input type="hidden" name="cmd" value="#arguments.type#">
 					<input type="hidden" name="business" value="#arguments.business#">
@@ -291,8 +301,14 @@
 						<input type="hidden" name="cpp_header_image" value="#arguments.headerImage#">
 					</cfif>
 
-					<input type="image" src="#loc.imageSource#" border="0" name="submit" alt="#loc.langButtonAlt#">
-					<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+					<cfif arguments.onLoadSubmit EQ 0>
+						<input type="image" src="#loc.imageSource#" border="0" name="submit" alt="#loc.langButtonAlt#">
+						<img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+					<cfelse>				
+						#arguments.onLoadSubmitMessage#
+							
+						<script>document.paypalform.submit();</script>	
+					</cfif>
 				</form>
 			</cfsavecontent>
 
